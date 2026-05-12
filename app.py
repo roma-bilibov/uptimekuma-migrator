@@ -1,6 +1,5 @@
 from dotenv import load_dotenv
-from importers.json.JsonImporter import JsonImporter
-from importers.uptime_robot.UptimeRobotImporter import UptimeRobotImporter
+from importers import JsonImporter, RemoteJsonImporter, UptimeRobotImporter
 from uptime.ApiClient import ApiClient
 
 
@@ -10,7 +9,10 @@ if __name__ == '__main__':
     api_client = ApiClient()
     try:
         # To import from local JSON file:
-        importer = JsonImporter(api_client)
+        importer = RemoteJsonImporter(api_client)
+
+        # To import from local JSON file:
+        # importer = JsonImporter(api_client)
 
         # To import from UptimeRobot:
         # importer = UptimeRobotImporter(api_client)
