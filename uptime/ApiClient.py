@@ -26,6 +26,10 @@ class ApiClient:
     def _clean_if_configured(self):
         if os.getenv('CLEAN_EXISTING_MONITORS', '').upper() != 'TRUE':
             return
+        confirm = input('This will delete ALL existing monitors from Uptime Kuma. Are you sure? [y/N]: ').strip().lower()
+        if confirm != 'y':
+            print('Skipping monitor cleanup.')
+            return
         print('Cleaning monitors from Uptime Kuma API.')
         for monitor in self.api.get_monitors():
             self.api.delete_monitor(monitor['id'])
