@@ -17,14 +17,14 @@ class UptimeRobotPortMonitor(Monitor):
         try:
             self.api.add_monitor(
                 type=MonitorType.PORT,
-                name=self.monitor['friendly_name'],
+                name=self.name,
                 url=self.monitor['url'],
                 interval=self.monitor['interval'],
                 hostname=self.monitor['url'],
                 port=self.monitor['port'],
             )
-            print(f"Monitor '{self.monitor['friendly_name']}' added to Uptime Kuma with type PORT.")
+            print(f"Monitor '{self.name}' added to Uptime Kuma with type PORT.")
 
         except UptimeKumaException as e:
-            print(f"Monitor '{self.monitor['friendly_name']}' failed to sync to Uptime Kuma.")
+            print(f"Monitor '{self.name}' failed to sync to Uptime Kuma.")
             print(e)

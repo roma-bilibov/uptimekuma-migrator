@@ -15,7 +15,7 @@ class Monitor(ABC):
     ):
         self.monitor = monitor
         self.api = api
-        self.name = monitor['friendly_name']
+        self.name = monitor['friendly_name'].strip()
         self.status = int(monitor['status']) if 'status' in monitor else 0
     
 

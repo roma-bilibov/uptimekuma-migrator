@@ -17,12 +17,12 @@ class UptimeRobotPingMonitor(Monitor):
         try:
             self.api.add_monitor(
                 type=MonitorType.PING,
-                name=self.monitor['friendly_name'],
+                name=self.name,
                 hostname=self.monitor['url'],
                 url=self.monitor['url'],
                 interval=self.monitor['interval'],
             )
-            print(f"Monitor '{self.monitor['friendly_name']}' added to Uptime Kuma with type PING.")
+            print(f"Monitor '{self.name}' added to Uptime Kuma with type PING.")
         except UptimeKumaException as e:
-            print(f"Monitor '{self.monitor['friendly_name']}' failed to sync to Uptime Kuma.")
+            print(f"Monitor '{self.name}' failed to sync to Uptime Kuma.")
             print(e)

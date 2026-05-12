@@ -22,7 +22,7 @@ class UptimeRobotKeywordMonitor(Monitor):
 
             self.api.add_monitor(
                 type=MonitorType.KEYWORD,
-                name=self.monitor['friendly_name'],
+                name=self.name,
                 url=self.monitor['url'],
                 hostname=self.monitor['url'],
                 interval=self.monitor['interval'],
@@ -30,9 +30,9 @@ class UptimeRobotKeywordMonitor(Monitor):
                 upsideDown=flip,
             )
 
-            print(f"Monitor '{self.monitor['friendly_name']}' added to Uptime Kuma with type KEYWORD.")
+            print(f"Monitor '{self.name}' added to Uptime Kuma with type KEYWORD.")
 
         except UptimeKumaException as e:
             
-            print(f"Monitor '{self.monitor['friendly_name']}' failed to sync to Uptime Kuma.")
+            print(f"Monitor '{self.name}' failed to sync to Uptime Kuma.")
             print(e)
