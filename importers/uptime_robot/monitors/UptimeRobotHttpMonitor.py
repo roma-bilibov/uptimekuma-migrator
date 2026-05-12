@@ -24,6 +24,7 @@ class UptimeRobotHttpMonitor(Monitor):
                 hostname=self.monitor['url'],
                 interval=self.monitor['interval'],
                 expiryNotification=self.expire_notification,
+                accepted_statuscodes=self.accepted_statuscodes
             )
             
             print(f"Monitor '{self.name}' added to Uptime Kuma with type HTTP.")

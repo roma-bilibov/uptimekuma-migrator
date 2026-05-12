@@ -24,6 +24,7 @@ class JsonMonitor(Monitor):
                 hostname=self.url,
                 interval=self.interval,
                 expiryNotification=self.expire_notification,
+                accepted_statuscodes=self.accepted_statuscodes
             )
             print(f"Monitor '{self.name}' added to Uptime Kuma with type HTTP.")
         except UptimeKumaException as e:

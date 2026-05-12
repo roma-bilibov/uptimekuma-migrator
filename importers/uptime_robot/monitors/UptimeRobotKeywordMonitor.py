@@ -28,6 +28,7 @@ class UptimeRobotKeywordMonitor(Monitor):
                 interval=self.monitor['interval'],
                 keyword=self.monitor['keyword_value'],
                 upsideDown=flip,
+                accepted_statuscodes=self.accepted_statuscodes
             )
 
             print(f"Monitor '{self.name}' added to Uptime Kuma with type KEYWORD.")

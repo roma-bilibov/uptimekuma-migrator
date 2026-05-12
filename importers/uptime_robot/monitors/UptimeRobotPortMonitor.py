@@ -22,6 +22,7 @@ class UptimeRobotPortMonitor(Monitor):
                 interval=self.monitor['interval'],
                 hostname=self.monitor['url'],
                 port=self.monitor['port'],
+                accepted_statuscodes=self.accepted_statuscodes
             )
             print(f"Monitor '{self.name}' added to Uptime Kuma with type PORT.")
 

@@ -21,6 +21,7 @@ class UptimeRobotPingMonitor(Monitor):
                 hostname=self.monitor['url'],
                 url=self.monitor['url'],
                 interval=self.monitor['interval'],
+                accepted_statuscodes=self.accepted_statuscodes
             )
             print(f"Monitor '{self.name}' added to Uptime Kuma with type PING.")
         except UptimeKumaException as e:
