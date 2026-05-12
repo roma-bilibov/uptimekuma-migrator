@@ -9,6 +9,15 @@ class Importer(ABC):
         self.api = api
         self.skip_paused_monitors = os.getenv('SKIP_PAUSED_MONITORS', '').upper() == 'TRUE'
         self.monitors = []
+        self._seen_names: set[str] = set()
+
+    def _add_monitor(self, monitor) -> bool:
+        if monitor.name in self._seen_names:
+            print(f"Monitor '{monitor.name}' is a duplicate in source data and will be skipped.")
+            return False
+        self._seen_names.add(monitor.name)
+        self.monitors.append(monitor)
+        return True
 
     @abstractmethod
     def load_data_source(self):

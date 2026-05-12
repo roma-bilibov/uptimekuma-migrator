@@ -17,7 +17,7 @@ class JsonImporter(Importer):
             items = json.load(f)
 
         for item in items:
-            self.monitors.append(
+            self._add_monitor(
                 JsonMonitor({'friendly_name': item['domain']}, self.api)
             )
 

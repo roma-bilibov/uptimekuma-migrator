@@ -9,10 +9,10 @@ if __name__ == '__main__':
     api_client = ApiClient()
     try:
         # To import from local JSON file:
-        importer = RemoteJsonImporter(api_client)
+        # importer = RemoteJsonImporter(api_client)
 
         # To import from local JSON file:
-        # importer = JsonImporter(api_client)
+        importer = JsonImporter(api_client)
 
         # To import from UptimeRobot:
         # importer = UptimeRobotImporter(api_client)

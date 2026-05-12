@@ -34,7 +34,7 @@ class UptimeRobotImporter(Importer):
             offset += limit
 
         for raw in fetched_monitors:
-            self.monitors.append(self._get_monitor(raw))
+            self._add_monitor(self._get_monitor(raw))
 
         print(f'Fetched {len(self.monitors)} monitors total from UptimeRobot API.')
 

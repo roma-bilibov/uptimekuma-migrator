@@ -21,7 +21,7 @@ class RemoteJsonImporter(Importer):
         items = response.json()
 
         for item in items:
-            self.monitors.append(
+            self._add_monitor(
                 JsonMonitor({'friendly_name': item['domain']}, self.api)
             )
 
