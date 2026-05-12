@@ -1,91 +1,94 @@
-# UptimeKuma Migrator
+# Uptime Kuma Migrator
 
-This script allows you to import monitors from UptimeRobot to Uptime Kuma using the Uptime Kuma API.
+CLI script that imports monitors into Uptime Kuma from three sources: UptimeRobot API, a local JSON file, or a remote JSON URL.
 
 ## Features
-- Syncs monitors from UptimeRobot to Uptime Kuma.
-- Supports HTTP(s), Ping, Keyword, and Port monitors.
-- Supports skipping paused monitors.
-- Supports cleaning all existing monitors from Uptime Kuma before syncing.
-- Duplicate monitors are skipped.
 
-## Supported Monitor Types
-While Uptime Kuma supports a wide range of monitor types, this script currently only supports the following monitor types:
-### HTTP(s)
-- Friendly Name
-- URL
-- Monitoring Interval
-- Hostname
-
-### Ping
-- Friendly Name
-- URL
-- Monitoring Interval
-- Hostname
-
-### Keyword
-- Friendly Name
-- URL
-- Monitoring Interval
-- Hostname
-- Keyword
-
-### Port
-- Friendly Name
-- URL
-- Monitoring Interval
-- Hostname
-- Port
-
-## Prerequisites
-
-Before running the script, make sure you have the following information:
-
-- UptimeRobot API key: Obtain this from your UptimeRobot account.
-- Uptime Kuma credentials: You need the protocol (http or https), URL or IP address of your Uptime Kuma instance, username, and password.
+- Import from **UptimeRobot** (paginated API), **local JSON**, or **remote JSON URL**
+- Supports HTTP(s), Ping, Keyword, and Port monitor types
+- Skips duplicate monitors (by name)
+- Optionally skips paused monitors
+- Optionally wipes all existing Uptime Kuma monitors before import (with confirmation prompt)
 
 ## Installation
 
-1. Clone this repository or download the script to your local machine.
+```bash
+python -m venv venv && source venv/bin/activate
+pip install -r requirements.txt
+cp .env.template .env
+```
 
-2. Install the required dependencies by running the following command:
-
-    ```bash
-    pip install -r requirements.txt
-    ```
-
-
-3. Update the following variables in the script:
-
-- `uptimerobot_api_key`: Replace `'UPTIMEROBOT-API-KEY'` with your UptimeRobot API key.
-- `uptimekuma_protocol`: Set this to `'http'` or `'https'` depending on the protocol used by your Uptime Kuma instance.
-- `uptimekuma_url`: Replace `'127.0.0.1:3001'` with the domain or IP address of your Uptime Kuma instance.
-- `uptimekuma_username`: Replace `'admin'` with your Uptime Kuma username.
-- `uptimekuma_password`: Replace `'password'` with your Uptime Kuma password.
-- `skip_paused_monitors`: Set this to `True` if you want to skip importing paused monitors.
-- `start_clean`: Set this to `True` if you want to clean all existing monitors from Uptime Kuma before importing.
+Fill in `.env` with your credentials (see [Environment Variables](#environment-variables) below).
 
 ## Usage
 
-To run the script, execute the following command:
+Choose an import source by editing `app.py` — uncomment the desired importer:
 
-```python sync.py```
+```python
+# Remote JSON (default):
+importer = RemoteJsonImporter(api_client)
 
+# Local JSON file (json_data/domains.json):
+# importer = JsonImporter(api_client)
 
-The script will perform the following steps:
+# UptimeRobot API:
+# importer = UptimeRobotImporter(api_client)
+```
 
-1. Fetch monitors from UptimeRobot API.
-2. Import each monitor to Uptime Kuma API.
-3. Print status messages and errors for each monitor sync.
+Then run:
 
-Please note that the script will print verbose output during the process.
+```bash
+python app.py
+```
 
-## Notes
+If `CLEAN_EXISTING_MONITORS=TRUE`, the script will ask for confirmation before deleting any data.
 
-- The script uses the `requests` library to make API requests, so make sure it is installed before running the script.
-- The `uptime_kuma_api` module is required for interacting with the Uptime Kuma API. Make sure it is present in the same directory as the script.
+## Environment Variables
+
+| Variable | Required for | Description |
+|---|---|---|
+| `UPTIME_API_URL` | All | WebSocket URL of Uptime Kuma (e.g. `http://127.0.0.1:3001`) |
+| `UPTIMEKUMA_USERNAME` | All | Uptime Kuma username |
+| `UPTIMEKUMA_PASSWORD` | All | Uptime Kuma password |
+| `CLEAN_EXISTING_MONITORS` | All | `TRUE`/`FALSE` — delete all monitors before import |
+| `SKIP_PAUSED_MONITORS` | All | `TRUE`/`FALSE` — skip monitors with status paused |
+| `EXPIRE_NOTIFICATION` | All | `0` or `1` — SSL expiry notifications on HTTP monitors |
+| `MONITOR_INTERVAL` | JSON / Remote JSON | Check interval in seconds (default `20`) |
+| `REMOTE_JSON_URL` | RemoteJsonImporter | URL returning `[{"domain": "..."}]` JSON |
+| `UPTIMEROBOT_URL` | UptimeRobotImporter | UptimeRobot API endpoint |
+| `UPTIMEROBOT_API_KEY` | UptimeRobotImporter | UptimeRobot API key |
+| `UPTIMEROBOT_OFFSET` | UptimeRobotImporter | Pagination start offset (usually `0`) |
+
+## Import Sources
+
+### Remote JSON (`RemoteJsonImporter`)
+
+Fetches a JSON array from `REMOTE_JSON_URL`. Expected format:
+
+```json
+[
+  {"domain": "example.com"},
+  {"domain": "another.com"}
+]
+```
+
+Each domain is imported as an HTTP monitor with `https://` prepended.
+
+### Local JSON (`JsonImporter`)
+
+Same format as above, read from `json_data/domains.json`.
+
+### UptimeRobot (`UptimeRobotImporter`)
+
+Paginates the UptimeRobot v2 API and maps monitor types:
+
+| UptimeRobot type | Uptime Kuma type |
+|---|---|
+| 1 — HTTP | HTTP |
+| 2 — Keyword | Keyword |
+| 3 — Ping | Ping |
+| 4 — Port | Port |
 
 ## License
 
-This script is released under the [MIT License](LICENSE).
-
+Released under the [MIT License](LICENSE).
