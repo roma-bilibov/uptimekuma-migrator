@@ -5,21 +5,17 @@ from uptime.ApiClient import ApiClient
 
 
 if __name__ == '__main__':
-
-    # Load environment variables from .env file
     load_dotenv()
-    
-    apiClient = ApiClient()
 
-    # To Import Local Json Data
-    # importer = JsonImporter(apiClient)
+    api_client = ApiClient()
+    try:
+        # To import from local JSON file:
+        importer = JsonImporter(api_client)
 
-    # To Import UptimeRobot Data
-    importer = UptimeRobotImporter(apiClient)
+        # To import from UptimeRobot:
+        # importer = UptimeRobotImporter(api_client)
 
-    # Load data from source
-    # JSON or UptimeRobot
-    importer.load_data_source()
-
-    # Upload data to Uptime Kuma
-    importer.migrate()
+        importer.load_data_source()
+        importer.migrate()
+    finally:
+        api_client.disconnect()

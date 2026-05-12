@@ -1,46 +1,33 @@
-import os 
+import os
 from uptime_kuma_api import UptimeKumaApi
 from importers.interfaces.Monitor import Monitor
 
+_REQUIRED_VARS = ['UPTIME_API_URL', 'UPTIMEKUMA_USERNAME', 'UPTIMEKUMA_PASSWORD', 'CLEAN_EXISTING_MONITORS', 'SKIP_PAUSED_MONITORS']
+
 class ApiClient:
     def __init__(self):
-        # Your details
-        uptimekuma_api_url = os.getenv('UPTIME_API_URL')  # domain or IP address of your Uptime Kuma instance
-        uptimekuma_username = os.getenv('UPTIMEKUMA_USERNAME')  # your Uptime Kuma username
-        uptimekuma_password = os.getenv('UPTIMEKUMA_PASSWORD')  # your Uptime Kuma password     
+        missing = [v for v in _REQUIRED_VARS if not os.getenv(v)]
+        if missing:
+            raise EnvironmentError(f"Missing required env vars: {', '.join(missing)}")
 
-        # Uptime Kuma API login
-        self.api = UptimeKumaApi(uptimekuma_api_url)
-        self.api.login(uptimekuma_username, uptimekuma_password)
+        self.api = UptimeKumaApi(os.getenv('UPTIME_API_URL'))
+        self.api.login(os.getenv('UPTIMEKUMA_USERNAME'), os.getenv('UPTIMEKUMA_PASSWORD'))
+        self._clean_if_configured()
 
-        self.clean_uptimekuma_monitors()
+    def disconnect(self):
+        self.api.disconnect()
 
-    
-    # Clean monitors from Uptime Kuma API
-    def clean_uptimekuma_monitors(self):
-        if os.getenv('CLEAN_EXISTING_MONITORS').upper() == 'TRUE':
-            """
-            Cleans monitors from Uptime Kuma API.
-            """
-            print('Cleaning monitors from Uptime Kuma API.')
-            monitors = self.api.get_monitors()
-            for monitor in monitors:
-                self.api.delete_monitor(monitor['id'])
-                print(f"Monitor '{monitor['name']}' deleted from Uptime Kuma.")
-            print('Done cleaning monitors from Uptime Kuma API.')
-
-
-    def check_if_monitor_exists(self, monitor: Monitor):
-        """
-        Checks if a monitor already exists in Uptime Kuma.
-        Returns True if monitor exists, False if not.
-        """
-        monitors = self.api.get_monitors()
-        for m in monitors:
-            if m['name'] == monitor.name:
-                return True
-        return False
-
+    def get_existing_names(self) -> set[str]:
+        return {m['name'] for m in self.api.get_monitors()}
 
     def add_monitor(self, **kwargs):
         self.api.add_monitor(**kwargs)
+
+    def _clean_if_configured(self):
+        if os.getenv('CLEAN_EXISTING_MONITORS', '').upper() != 'TRUE':
+            return
+        print('Cleaning monitors from Uptime Kuma API.')
+        for monitor in self.api.get_monitors():
+            self.api.delete_monitor(monitor['id'])
+            print(f"Monitor '{monitor['name']}' deleted from Uptime Kuma.")
+        print('Done cleaning monitors from Uptime Kuma API.')
