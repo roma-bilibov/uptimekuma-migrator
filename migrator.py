@@ -1,24 +1,32 @@
+import os
 import requests
 import json
+from dotenv import load_dotenv
 from uptime_kuma_api import UptimeKumaApi
 from uptime_kuma_api import UptimeKumaException
 from uptime_kuma_api import MonitorType
 
+
+# Load environment variables from .env file
+load_dotenv()
+
 # Your details
-uptimerobot_api_key = 'UPTIMEROBOT-API-KEY'  # your UptimeRobot API key
-uptimekuma_protocol = 'https'  # http or https
-uptimekuma_url = '127.0.0.1:3001'  # domain or IP address of your Uptime Kuma instance
-uptimekuma_username = 'admin'  # your Uptime Kuma username
-uptimekuma_password = 'password'  # your Uptime Kuma password
+uptimekuma_api_url = os.getenv('UPTIME_API_URL')  # domain or IP address of your Uptime Kuma instance
+uptimekuma_username = os.getenv('UPTIME_API_USERNAME')  # your Uptime Kuma username
+uptimekuma_password = os.getenv('UPTIME_API_PASSWORD')  # your Uptime Kuma password
+
+# UptimeRobot
+uptimerobot_monitor_url = os.getenv('UPTIMEROBOT_URL')  # your UptimeRobot URL
+uptimerobot_api_key = os.getenv('UPTIMEROBOT_API_KEY')  # your UptimeRobot API key
 
 # Options
-skip_paused_monitors = False  # skip paused monitors
-expire_notification = False  # send notification when monitor SSL expires (HTTPS monitors only)
-start_clean = False  # clean all monitors from Uptime Kuma before syncing
+skip_paused_monitors = os.getenv('SKIP_PAUSED_MONITORS')  # skip paused monitors
+expire_notification = os.getenv('EXPIRE_NOTIFICATION')  # send notification when monitor SSL expires (HTTPS monitors only)
+start_clean = os.getenv('START_CLEAN')  # clean all monitors from Uptime Kuma before syncing
 
 # Uptime Kuma API login
 uptimerobot_offset = 0
-api = UptimeKumaApi(f'{uptimekuma_protocol}://{uptimekuma_url}')
+api = UptimeKumaApi(uptimekuma_api_url)
 api.login(uptimekuma_username, uptimekuma_password)
 
 
@@ -40,14 +48,12 @@ def fetch_uptimerobot_monitors():
     Fetches monitor data from UptimeRobot API.
     Returns a list of monitors.
     """
-    monitor_url = "https://api.uptimerobot.com/v2/getMonitors"
-
     payload = f"api_key={uptimerobot_api_key}&format=json&logs=1&offset={uptimerobot_offset}"
     headers = {
         'content-type': "application/x-www-form-urlencoded",
         'cache-control': "no-cache"
     }
-    response = requests.request("POST", monitor_url, data=payload, headers=headers)
+    response = requests.request("POST", uptimerobot_monitor_url, data=payload, headers=headers)
     data = json.loads(response.text)
 
     if data['stat'] == 'ok':
